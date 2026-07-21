@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' 'unsafe-eval' file: data: blob: https://fonts.googleapis.com https://fonts.gstatic.com; img-src 'self' file: data: blob:; frame-src file: blob:; font-src 'self' file: data: https://fonts.gstatic.com;">
+  <title>Inkwell</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Merriweather:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="lib/fa.min.css"/>
+  <link rel="stylesheet" href="style.css"/>
+  <script src="lib/pdf.min.js"></script>
+  <script src="lib/epub.min.js"></script>
+</head>
+<body>
+
+<!-- TITLEBAR -->
+<div class="titlebar">
+  <div class="tb-left">
+    <span class="app-name">📖 Inkwell</span>
+  </div>
+  <div class="tb-drag"></div>
+  <div class="tb-controls">
+    <button class="wbtn minimize" onclick="window.api.minimize()" title="Minimize"></button>
+    <button class="wbtn maximize" onclick="window.api.maximize()" title="Maximize"></button>
+    <button class="wbtn close"    onclick="window.api.close()"    title="Close"></button>
+  </div>
+</div>
+
+<!-- APP SHELL -->
+<div class="shell">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="sb-head">
+      <span class="sb-title">My Library</span>
+      <button class="icon-btn" onclick="addBooks()" title="Add books"><i class="fas fa-plus"></i></button>
+    </div>
+    <div class="sb-search">
+      <i class="fas fa-search"></i>
+      <input id="searchInput" placeholder="Search books…" oninput="filterBooks()"/>
+    </div>
+    <div class="sb-list" id="bookList"></div>
+    <div class="sb-foot">
+      <button class="sb-foot-btn" onclick="toggleDarkMode()">
+        <i class="fas fa-moon" id="darkModeIcon"></i><span>Dark Mode</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- MAIN AREA -->
+  <div class="main-area">
+
+    <!-- LIBRARY VIEW -->
+    <div class="view" id="libraryView">
+      <div class="lib-hero" id="libHero">
+        <div class="lib-hero-emoji">📚</div>
+        <h1>Your Reading Space</h1>
+        <p>Add books by clicking the button below or drag & drop files here</p>
+        <button class="btn-hero" onclick="addBooks()"><i class="fas fa-plus-circle"></i> Add Books</button>
+      </div>
+      <div class="book-grid" id="booksGrid"></div>
+    </div>
+
+    <!-- READER VIEW -->
+    <div class="view hidden" id="readerView">
+
+      <!-- READER TOPBAR -->
+      <div class="reader-bar">
+        <div class="rbar-left">
+          <button class="icon-btn" onclick="closeReader()" title="Back to Library"><i class="fas fa-arrow-left"></i></button>
+          <button class="icon-btn" onclick="addBooks()" title="Add a book"><i class="fas fa-plus"></i></button>
+          <div class="rbar-info">
+            <span class="rbar-title" id="readerTitle">Title</span>
+            <span class="rbar-author" id="readerAuthor">Author</span>
+          </div>
+        </div>
+        <div class="rbar-right">
+          <button class="icon-btn" onclick="decreaseFontSize()" title="Zoom out"><i class="fas fa-search-minus"></i></button>
+          <button class="icon-btn" onclick="increaseFontSize()" title="Zoom in"><i class="fas fa-search-plus"></i></button>
+          <button class="icon-btn" onclick="togglePageMode()" title="Toggle page/scroll" id="pageModeBtn"><i class="fas fa-columns"></i></button>
+          <button class="icon-btn" onclick="toggleReaderDark()" title="Invert colors" id="readerDarkBtn"><i class="fas fa-adjust"></i></button>
+          <div class="rbar-sep"></div>
+          <button class="icon-btn" onclick="toggleNotesPanel()" title="Notes"><i class="fas fa-sticky-note"></i></button>
+          <button class="icon-btn" onclick="togglePomodoroPanel()" title="Pomodoro Timer"><i class="fas fa-clock"></i></button>
+        </div>
+      </div>
+
+      <!-- READER BODY: content + panels side by side -->
+      <div class="reader-body">
+
+        <!-- BOOK CONTENT -->
+        <div class="book-content" id="readerContent">
+
+          <!-- PDF -->
+          <div class="fmt-pane hidden" id="pdfReader">
+            <div class="pdf-nav">
+              <button class="icon-btn" onclick="pdfPrevPage()"><i class="fas fa-chevron-left"></i></button>
+              <span id="pdfPageInfo">Page 1 / 1</span>
+              <button class="icon-btn" onclick="pdfNextPage()"><i class="fas fa-chevron-right"></i></button>
+              <span class="pdf-select-hint">Select text to highlight · Click highlight to remove</span>
+            </div>
+            <div class="pdf-scroll">
+              <div class="pdf-page-wrap" id="pdfPageWrap">
+                <canvas id="pdfCanvas"></canvas>
+                <div id="pdfTextLayer" class="pdf-text-layer"></div>
+                <div id="pdfHighlightLayer" class="pdf-highlight-layer"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- EPUB -->
+          <div class="fmt-pane hidden" id="epubReader">
+            <button class="epub-arrow epub-prev" onclick="epubPrev()"><i class="fas fa-chevron-left"></i></button>
+            <div id="epubViewer"></div>
+            <button class="epub-arrow epub-next" onclick="epubNext()"><i class="fas fa-chevron-right"></i></button>
+          </div>
+
+          <!-- TXT / plain -->
+          <div class="fmt-pane hidden" id="txtReader">
+            <div class="txt-scroll">
+              <div class="txt-content" id="txtContent"></div>
+            </div>
+          </div>
+
+          <!-- UNSUPPORTED / MOBI etc. -->
+          <div class="fmt-pane hidden" id="unsupReader">
+            <div class="unsup-body" id="unsupContent"></div>
+          </div>
+
+        </div>
+
+        <!-- NOTES PANEL -->
+        <div class="side-panel hidden" id="notesPanel">
+          <div class="panel-header">
+            <h3><i class="fas fa-sticky-note"></i> Notes</h3>
+            <button class="icon-btn" onclick="toggleNotesPanel()"><i class="fas fa-times"></i></button>
+          </div>
+          <div class="panel-body">
+            <div class="note-compose">
+              <textarea id="newNoteInput" placeholder="Write a note or highlight passage…"></textarea>
+              <button class="btn-primary" onclick="addNote()"><i class="fas fa-plus"></i> Add Note</button>
+            </div>
+            <div id="notesList"></div>
+          </div>
+        </div>
+
+        <!-- POMODORO PANEL -->
+        <div class="side-panel hidden" id="pomodoroPanel">
+          <div class="panel-header">
+            <h3><i class="fas fa-clock"></i> Pomodoro</h3>
+            <button class="icon-btn" onclick="togglePomodoroPanel()"><i class="fas fa-times"></i></button>
+          </div>
+          <div class="panel-body">
+            <div class="pomo-tabs">
+              <button class="pomo-tab active" id="pomoTabFocus" onclick="setPomoMode('focus')">Focus</button>
+              <button class="pomo-tab" id="pomoTabBreak" onclick="setPomoMode('break')">Break</button>
+              <button class="pomo-tab" id="pomoTabLong"  onclick="setPomoMode('long')">Long Break</button>
+            </div>
+
+            <div class="pomo-ring-wrap">
+              <svg class="pomo-ring" viewBox="0 0 120 120">
+                <circle cx="60" cy="60" r="52" class="pomo-ring-bg"/>
+                <circle cx="60" cy="60" r="52" class="pomo-ring-fill" id="pomoRingFill"/>
+              </svg>
+              <div class="pomo-center">
+                <div class="pomo-time" id="pomoTime">25:00</div>
+                <div class="pomo-sublabel" id="pomoLabel">Focus 🎯</div>
+              </div>
+            </div>
+
+            <div class="pomo-btns">
+              <button class="pomo-play" id="pomoPlayBtn" onclick="togglePomodoro()"><i class="fas fa-play"></i> Start</button>
+              <button class="pomo-reset" onclick="resetPomodoro()"><i class="fas fa-redo"></i></button>
+            </div>
+
+            <div class="pomo-settings">
+              <div class="pomo-setting-row"><label>Focus (min)</label><input type="number" id="pomoFocusMins" value="25" min="1" max="120" onchange="updatePomoSettings()"/></div>
+              <div class="pomo-setting-row"><label>Break (min)</label><input type="number" id="pomoBreakMins" value="5"  min="1" max="60"  onchange="updatePomoSettings()"/></div>
+              <div class="pomo-setting-row"><label>Long Break</label><input type="number"  id="pomoLongMins"  value="15" min="1" max="60"  onchange="updatePomoSettings()"/></div>
+            </div>
+            <div class="pomo-sessions">Sessions today: <strong id="pomoCount">0</strong></div>
+          </div>
+        </div>
+
+      </div><!-- /reader-body -->
+
+      <!-- PROGRESS BAR -->
+      <div class="progress-bar-wrap">
+        <div class="progress-bar" id="progressBar"></div>
+        <span class="progress-label" id="progressLabel">0%</span>
+      </div>
+
+    </div><!-- /readerView -->
+  </div><!-- /main-area -->
+</div><!-- /shell -->
+
+<!-- CONTEXT MENU -->
+<div class="ctx-menu hidden" id="contextMenu">
+  <button onclick="highlightSelection('yellow')"><span class="dot" style="background:#fbbf24"></span>Highlight Yellow</button>
+  <button onclick="highlightSelection('green')"><span class="dot"  style="background:#34d399"></span>Highlight Green</button>
+  <button onclick="highlightSelection('pink')"><span class="dot"   style="background:#f472b6"></span>Highlight Pink</button>
+  <div class="ctx-sep"></div>
+  <button onclick="askChatGPT()"><i class="fas fa-robot"></i> Ask ChatGPT</button>
+  <button onclick="copySelection()"><i class="fas fa-copy"></i> Copy</button>
+</div>
+
+<!-- EDIT MODAL -->
+<div class="modal-overlay hidden" id="editModal">
+  <div class="modal-box">
+    <h3>Edit Book Info</h3>
+    <input type="text" id="editTitle"  placeholder="Title"/>
+    <input type="text" id="editAuthor" placeholder="Author"/>
+    <div class="edit-cover-row" id="editCoverRow">
+      <div class="edit-cover-preview" id="editCoverPreview"></div>
+      <button class="btn-outline" onclick="pickCustomThumbnail()"><i class="fas fa-image"></i> Change Cover</button>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-outline" onclick="closeEditModal()">Cancel</button>
+      <button class="btn-primary" onclick="saveEditModal()">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- DROP OVERLAY -->
+<div class="drop-overlay hidden" id="dropOverlay">
+  <div class="drop-inner">
+    <i class="fas fa-book-open"></i>
+    <p>Drop books here to add them</p>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>

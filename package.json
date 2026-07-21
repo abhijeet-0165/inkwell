@@ -1,0 +1,16 @@
+{
+    "name": "inkwell",
+    "version": "1.0.0",
+    "description": "A modern book reader app",
+    "main": "main.js",
+    "scripts": {
+        "start": "electron ."
+    },
+    "keywords": [],
+    "author": "Abhijeet Singh",
+    "license": "ISC",
+    "dependencies": {
+        "better-sqlite3": "^13.0.1",
+        "electron": "^43.1.1"
+    }
+}
