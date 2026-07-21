@@ -1,5 +1,3 @@
-<img width="1601" height="988" alt="image" src="https://github.com/user-attachments/assets/f7a5ab6d-28eb-4faf-854a-4a0047f0773a" /># 📚 Inkwell - AI-Powered Book Reader
-
 > **A fully AI-coded desktop book reading application built entirely through vibe coding**
 
 ![Inkwell](https://img.shields.io/badge/Built%20With-AI-purple?style=for-the-badge)
