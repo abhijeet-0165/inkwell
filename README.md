@@ -1,4 +1,4 @@
-# 📚 Inkwell - AI-Powered Book Reader
+<img width="1601" height="988" alt="image" src="https://github.com/user-attachments/assets/f7a5ab6d-28eb-4faf-854a-4a0047f0773a" /># 📚 Inkwell - AI-Powered Book Reader
 
 > **A fully AI-coded desktop book reading application built entirely through vibe coding**
 
@@ -101,7 +101,8 @@ npm start
 
 ## 🎨 Screenshots
 
-*(Add screenshots here after deployment)*
+<img width="1601" height="988" alt="image" src="https://github.com/user-attachments/assets/3e426f54-7be3-4395-b25f-dde9d3df2f5a" />
+
 
 ## 🧪 The Vibe Coding Process
 
@@ -183,6 +184,4 @@ MIT License - feel free to use, modify, and distribute.
 
 ---
 
-**Built with 💜 by AI • No manual coding • Pure vibe energy**
-
-*This README itself was AI-generated as part of the vibe coding process.*
+**Built with 💜 by [Abhijeet singh](https://github.com/abhijeet-0165) • No manual coding • Pure vibe energy**
